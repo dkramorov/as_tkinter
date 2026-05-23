@@ -1,157 +1,12 @@
 #!/usb/bin/env python3
 
-
 import tkinter as tk
 import tkinter.messagebox
 import tkinter.filedialog
-from tkinter import ttk
+import ttkbootstrap as ttk
+import ttkbootstrap.widgets.scrolled
 
-
-class AbstractWidget:
-    """Абстрактный компонент с общими методами для всех компонентов
-    """
-    def __init__(self, **kwargs):
-        """Инициализация виджета, параметры в kwargs:
-
-           # Common (label)
-           text - текст
-           justify - выравнивание LEFT, RIGHT, CENTER
-           anchor - точка начала виджета компасом E, SW
-           width - ширина
-           height - высота
-           bg - фон виджета red
-           fg - цвет текста виджета green
-           bd
-           relief # RAISED, SUNKEN
-           font - шрифт Arial 20 italic | ('Comic Sans MS', 20, 'bold', 'underline')
-           padx - отступ по х
-           pady - отступ по у
-           cursor - курсор
-           image - изображение PhotoImage(file='logo.png')
-           underline - подчеркивание символа 1 (не робит)
-           wraplength - перенос строки по ширине
-
-           # Button
-           activebackground - фон для активной кнопки
-           state - состояние кнопки NORMAL, ACTIVE, DISABLED
-           borderwidth - ширина рамки
-           command - функция при нажатии
-
-           # LabelFrame
-           labelanchor - расположение текста на рамке по компасу SE
-        """
-        pass
-
-    @classmethod
-    def check_kwargs(self, **kwargs):
-        """Преобразование параметров из строк в константы
-           например, side='BOTTOM' => tk.BOTTOM
-        """
-        for key, value in kwargs.items():
-            if key in (
-                'justify', 'relief', 'sashrelief', 'state',
-                'side', 'wrap', 'fill', 'anchor',
-                'labelanchor', 'sticky', 'orient', 'arrow',
-            ):
-                kwargs[key] = getattr(tk, value.upper())
-        return kwargs
-
-    def pack(self, **kwargs):
-        """Выводит виджет и возвращает экземпляр, параметры в kwargs:
-           ['side'] = TOP # выводит виджет в нужную область (LEFT, BOTTOM)
-           ['expand'] = 1 # заполняет пространство виджетом (False, 0)
-           ['fill'] = 'X' # растянуть виджет (X, Y, BOTH)
-           ['anchor'] = 'S' # позиционировать виджет по компасу (E, NE, SW)
-        """
-        super().pack(**self.check_kwargs(**kwargs))
-        return self
-
-    def place(self, **kwargs):
-        """Выводит виджет и возвращает экземпляр, параметры в kwargs:
-           ['x'] = 30 # виджет в x координату
-           ['y'] = 60 # виджет в y координату
-           ['relx'] = 0.5 # виджет в позицию от ширины родительского контейнера (0-1)
-           ['rely'] = 0.5 # виджет в позицию от высоты родительского контейнера (0-1)
-           ['anchor'] = 'CENTER' # задает точку начала виджета (можно компасом SE)
-           ['relwidth'] = 0.5 # задать ширину виджета (0-1)
-           ['relheight'] = 0.5 # задать высоту виджета (0-1)
-        """
-        super().place(**self.check_kwargs(**kwargs))
-        return self
-
-    def grid(self, **kwargs):
-        """Выводит виджет и возвращает экземпляр, параметры в kwargs:
-           ['row'] = 0 # виджет в 0 строку
-           ['column'] = 0 # виджет в 0 ряд
-           ['columnspan'] = 2 # объединяет в строке 2 столбца
-           ['rowspan'] = 2 # объединяет в стобце 2 строки
-           ['ipadx'] = 10 # отступ по x
-           ['ipady'] = 10 # отступ по y
-           ['sticky'] = SW # позиционирование элемента в ячейке по компасу
-        """
-        super().grid(**self.check_kwargs(**kwargs))
-        return self
-
-    @classmethod
-    def bind(cls, **kwargs):
-        """Привязывает функцию к виджету
-           Использование, 
-           def test_bind(event):
-               print('test bind', event)
-           Label(**{'text':'test-bind'}).bind(test_bind)
-           root.bind('<Key>', test_bind) # проверка какая клавиша была нажата
-           kwargs['sequence'] = <Button-1> строка описывающая действие пользователя
-           kwargs['func'] = print функция, которая должна выполниться
-        """
-        cls.bind(**kwargs)
-
-
-class StringVar(tk.StringVar):
-    """Переменная, например, для Radiobutton
-    """
-    def set(self, value: str):
-        """Установить значение переменной
-           string_var.set('test')
-           :param value: значение
-        """
-        super().set(value)
-
-    def get(self):
-        """Получить значение переменной
-        """
-        return super().get()
-
-
-class BooleanVar(tk.BooleanVar):
-    """Переменная, например, для Radiobutton
-    """
-    def set(self, value: int):
-        """Установить значение переменной
-           boolean_var.set(0)
-           :param value: значение
-        """
-        super().set(value)
-
-    def get(self):
-        """Получить значение переменной
-        """
-        return super().get()
-
-
-class IntVar(tk.IntVar):
-    """Переменная, например, для Scale
-    """
-    def set(self, value: int):
-        """Установить значение переменной
-           boolean_var.set(0)
-           :param value: значение
-        """
-        super().set(value)
-
-    def get(self):
-        """Получить значение переменной
-        """
-        return super().get()
+from as_tkinter.abstract_widget import AbstractWidget
 
 
 class PhotoImage(tk.PhotoImage):
@@ -343,7 +198,7 @@ class Filedialog:
         return tkinter.filedialog.asksaveasfilename(**kwargs)
 
 
-class Canvas(tk.Canvas, AbstractWidget):
+class Canvas(ttk.Canvas, AbstractWidget):
     """Холст для рисования
     canvas = Canvas(root, **{'width': 500, 'height': 500, 'bg': 'black'}).pack()
     canvas.create_rectangle(**{
@@ -411,13 +266,13 @@ class Canvas(tk.Canvas, AbstractWidget):
         super().create_text(x1, y1, **kwargs)
 
 
-class PanedWindow(tk.PanedWindow, AbstractWidget):
+class Panedwindow(ttk.Panedwindow, AbstractWidget):
     """Окно внутри другого окна с возможностью изменения размеров
-    screen = PanedWindow(root).pack(fill='BOTH', expand=1)
+    screen = Panedwindow(root).pack(fill='BOTH', expand=1)
     label = Label(screen, text='Left side')
     screen.add(label)
     # Вертикальная панелька
-    screen2 = PanedWindow(
+    screen2 = Panedwindow(
         screen,
         orient='VERTICAL', # виджеты идут вертикально
         showhandle=True, # показывает ползунок для изменения размеров
@@ -448,7 +303,29 @@ class PanedWindow(tk.PanedWindow, AbstractWidget):
         return self
 
 
-class Frame(tk.Frame, AbstractWidget):
+class ScrolledFrame(ttkbootstrap.widgets.scrolled.ScrolledFrame, AbstractWidget):
+    """Фрейм со скролом для размещения в окне, а в него уже размещаются виджеты
+    frame = ScrolledFrame(root).pack(**{
+        'side': 'BOTTOM',
+    })
+    """
+    def __init__(self, parent, **kwargs):
+       super().__init__(parent, **self.check_kwargs(**kwargs))
+
+    def pack(self, **kwargs):
+        super().pack(**self.check_kwargs(**kwargs))
+        return self
+
+    def place(self, **kwargs):
+        super().place(**self.check_kwargs(**kwargs))
+        return self
+
+    def grid(self, **kwargs):
+        super().grid(**self.check_kwargs(**kwargs))
+        return self
+
+
+class Frame(ttk.Frame, AbstractWidget):
     """Фрейм для размещения в окне, а в него уже размещаются виджеты
     frame = Frame(root).pack(**{
         'side': 'BOTTOM',
@@ -470,8 +347,8 @@ class Frame(tk.Frame, AbstractWidget):
         return self
 
 
-class LabelFrame(tk.LabelFrame, AbstractWidget):
-    """Фрейм для размещения с рамокй и заголовком в окне,
+class LabelFrame(ttk.LabelFrame, AbstractWidget):
+    """Фрейм для размещения с рамкой и заголовком в окне,
        а в него уже размещаются виджеты
     frame = LabelFrame(root, **{
         'text': 'Фрейм', 'labelanchor': 'SE',
@@ -495,7 +372,7 @@ class LabelFrame(tk.LabelFrame, AbstractWidget):
         return self
 
 
-class Label(tk.Label, AbstractWidget):
+class Label(ttk.Label, AbstractWidget):
     """Метка
     label = Label(root, **{
         'text': 'ДРАТУЙ test\ntest2', 'fg': 'lime', 'bg': 'black',
@@ -797,7 +674,7 @@ class Spinbox(tk.Spinbox, AbstractWidget):
         return self
 
 
-class Entry(tk.Entry, AbstractWidget):
+class Entry(ttk.Entry, AbstractWidget):
     """Ввод текста
     entry = Entry(root, **{
         'font': ('Arial', 20),
@@ -912,7 +789,7 @@ class Text(tk.Text, AbstractWidget):
         return super().get(start_index, end_index)
 
 
-class Scrollbar(tk.Scrollbar, AbstractWidget):
+class Scrollbar(ttk.Scrollbar, AbstractWidget):
     """Ползунок прокрутки
     text = Text(root).pack(side='LEFT')
     scroll = Scrollbar(root, **{
@@ -1084,6 +961,37 @@ class Separator(ttk.Separator, AbstractWidget):
     # Изменить стиль
     s = ttk.Style()
     s.configure('TSeparator', background='lime', border=100)
+    """
+    def __init__(self, parent, *args, **kwargs):
+       super().__init__(parent, **self.check_kwargs(**kwargs))
+
+    def pack(self, **kwargs):
+        super().pack(**self.check_kwargs(**kwargs))
+        return self
+
+    def place(self, **kwargs):
+        super().place(**self.check_kwargs(**kwargs))
+        return self
+
+    def grid(self, **kwargs):
+        super().grid(**self.check_kwargs(**kwargs))
+        return self
+
+
+class Treeview(ttk.Treeview, AbstractWidget):
+    """Treeview таблица/дерево
+       tasks_columns = ('name', 'src', 'dst')
+       tasks_table = Treeview(root, **{
+           'bootstyle': 'warning',
+           'columns': tasks_columns,
+           'show': 'headings',
+       }).grid(**{'row': 0, 'column': 0, 'sticky': 'nsew'})
+       tasks_table.heading('name', text='Name')
+       tasks_table.heading('src', text='Source')
+       tasks_table.heading('dst', text='Destination')
+       data = [('1', '2', '3'), ('4', '5', '6')]
+       for i, item in enumerate(data):
+           tasks_table.insert('', i, values=item)
     """
     def __init__(self, parent, *args, **kwargs):
        super().__init__(parent, **self.check_kwargs(**kwargs))

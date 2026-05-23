@@ -184,11 +184,11 @@ if __name__ == '__main__':
     #list_box.delete(list_box.curselection())
     #print('after=%s, start_element=%s' % (list_box.size(), list_box.get(0)))
 
-    screen = PanedWindow(root).pack(fill='BOTH', expand=1)
+    screen = Panedwindow(root).pack(fill='BOTH', expand=1)
     label = Label(screen, text='Left side')
     screen.add(label)
     # Вертикальная панелька
-    screen2 = PanedWindow(
+    screen2 = Panedwindow(
         screen,
         orient='VERTICAL', # виджеты идут вертикально
         showhandle=True, # показывает ползунок для изменения размеров
